@@ -76,10 +76,45 @@ class UNET2D(nn.Module):
         out = self.head(out)
         return out
 
+
+class DAE(nn.Module):
+    def __init__(self, num_features):
+        super(DAE, self).__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Linear(in_features=num_features, out_features=512),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=512, out_features=128),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=128, out_features=32),
+            nn.ReLU(inplace=True)
+        )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(in_features=32, out_features=128),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=128, out_features=512),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=512, out_features=num_features),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        h = self.encoder(x)
+        return self.decoder(h)
+
 # test
 if __name__ == "__main__":
+    print("UNET2D Test")
     tmp = torch.rand(8,3,256,256)
     model = UNET2D(in_channels=3, out_channels=1)
     output = model.forward(tmp)
     print(f"Input size: {tmp.shape}")
     print(f"Output size: {output.shape}")
+
+    print("DAE Test")
+    denoiser_model = DAE(256*256)
+    random_data = torch.rand(8, 1, 256, 256)
+    flattened = torch.flatten(random_data, start_dim=2, end_dim=3)
+    print("Input size:", flattened.shape)
+    print("Output size:", denoiser_model(flattened).shape)

@@ -11,7 +11,7 @@ from dataset import SCD
 
 def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):
     running_loss = 0
-    loss = []
+    loss_hist = []
 
     for i, batch in enumerate(data_loader):
 
@@ -29,11 +29,11 @@ def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):
         running_loss += loss.item()
         if (i + 1) % verbose == 0:
             # Display loss
-            print(f"batch: {i}/{np.around(len(data_loader) / verbose)} loss: {running_loss / verbose}")
-            loss.append(running_loss)
+            print(f"batch: {i+1}/{len(data_loader)} loss: {running_loss / verbose}")
+            loss_hist.append(running_loss)
             running_loss = 0
 
-    return loss
+    return loss_hist
 
 if __name__ == "__main__":
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
         model.train(True)
         loss = train_one_epoch(train_dataloader, DEVICE, model, optimizer, loss_fn, verbose=5)
-        train_loss.append(loss)
+        train_loss.append(np.mean(np.array(loss)))
 
         model.eval()
         mean_val = 0
@@ -77,6 +77,6 @@ if __name__ == "__main__":
             mean_val += loss/len(val_dataloader)
         print(f"Validation Loss for Epoch {epoch+1}:", mean_val)
 
-    np.save(np.asarray(train_loss))
-    np.save(np.asarray(val_loss))
+    np.save("UNET_train_loss", np.asarray(train_loss))
+    np.save("UNET_val_loss", np.asarray(val_loss))
 
