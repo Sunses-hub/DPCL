@@ -4,8 +4,9 @@ import torch
 import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
-import UNET2D
-import SCD
+from model import UNET2D
+from dataset import SCD
+
 
 
 def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):

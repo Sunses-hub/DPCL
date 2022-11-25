@@ -45,7 +45,7 @@ class SCD(Dataset):
 
 # test
 if __name__ == "__main__":
-    path = os.path.join("Data", "Train", "Images", "SunnyBrook_Part1")
+    path = os.path.join("Data", "Train", "Images", "Sunnybrook_Part1")
     annotations = os.listdir(path)
     img_file = os.path.join(path, annotations[10])
     img = io.imread(img_file, as_gray=True)
