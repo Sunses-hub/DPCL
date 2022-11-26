@@ -27,7 +27,7 @@ class SCD(Dataset):
                         self.label_dirs.append(os.path.join(dir_name, file))
 
         if noisy:
-            self.noise = np.random.normal(loc=0, scale=1,size=(len(self.img_dirs), 256, 256))
+            self.noise = np.random.normal(loc=0, scale=1,size=(len(self.img_dirs), 1, 256, 256))
 
     def __len__(self):
         return len(self.img_dirs)

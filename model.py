@@ -82,26 +82,26 @@ class DAE(nn.Module):
         super(DAE, self).__init__()
 
         self.encoder = nn.Sequential(
+            nn.Flatten(start_dim=2, end_dim=3),
             nn.Linear(in_features=num_features, out_features=1024),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=1024, out_features=256),
+            nn.Linear(in_features=1024, out_features=512),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=256, out_features=64),
+            nn.Linear(in_features=512, out_features=256),
             nn.ReLU(inplace=True)
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(in_features=64, out_features=256),
+            nn.Linear(in_features=256, out_features=512),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=256, out_features=1024),
+            nn.Linear(in_features=512, out_features=1024),
             nn.ReLU(inplace=True),
             nn.Linear(in_features=1024, out_features=num_features),
             nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
-        h = torch.flatten(x, start_dim=2, end_dim=3)
-        h = self.encoder(h)
+        h = self.encoder(x)
         return self.decoder(h)
 
 # test

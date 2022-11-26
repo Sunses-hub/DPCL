@@ -37,18 +37,20 @@ if __name__ == "__main__":
 
         model.train(True)
         loss = train_one_epoch(train_dataloader, DEVICE, model, optimizer, loss_fn, verbose=5)
-        train_loss.append(np.mean(np.array(loss)))
+        epoch_mean_loss = np.sum(loss) / len(train_dataloader)
+        print(f"EPOCH {epoch+1} MEAN LOSS: {epoch_mean_loss}")
+        train_loss.append(epoch_mean_loss)
 
         model.eval()
-        mean_val = 0
+        batch_val_loss = 0
         for i, batch in enumerate(val_dataloader):
             inputs, labels = batch
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
             output = model(inputs.float())
-            loss = loss_fn(output, labels).item()
-            val_loss.append(loss)
-            mean_val += loss/len(val_dataloader)
-        print(f"Validation Loss for Epoch {epoch+1}:", mean_val)
+            batch_val_loss += loss_fn(output, labels).item()
+        epoch_valm_loss = batch_val_loss / len(val_dataloader)
+        val_loss.append(epoch_valm_loss)
+        print(f"Validation DICE Loss for Epoch {epoch+1}:", epoch_valm_loss)
 
     np.save("DAE_train_loss", np.asarray(train_loss))
     np.save("DAE_val_loss", np.asarray(val_loss))
