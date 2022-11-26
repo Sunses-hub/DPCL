@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 class SCD(Dataset):
     """Sunny Brook Cardiac Imaging Dataset"""
 
-    def __init__(self, train=True, root_dir='Data', transform=None, noisy=True):
+    def __init__(self, train=True, root_dir='Data', transform=None, noisy=False):
 
         self.root_dir = os.path.join(root_dir, 'Train') if train else os.path.join(root_dir, 'Test')
         self.img_dirs = []

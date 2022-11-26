@@ -100,7 +100,8 @@ class DAE(nn.Module):
         )
 
     def forward(self, x):
-        h = self.encoder(x)
+        h = torch.flatten(x, start_dim=2, end_dim=3)
+        h = self.encoder(h)
         return self.decoder(h)
 
 # test
@@ -114,7 +115,6 @@ if __name__ == "__main__":
 
     print("DAE Test")
     denoiser_model = DAE(256*256)
-    random_data = torch.rand(8, 1, 256, 256)
-    flattened = torch.flatten(random_data, start_dim=2, end_dim=3)
-    print("Input size:", flattened.shape)
-    print("Output size:", denoiser_model(flattened).shape)
+    random_data = torch.rand(16, 1, 256, 256)
+    print("Input size:", random_data.shape)
+    print("Output size:", denoiser_model(random_data).shape)

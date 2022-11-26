@@ -17,11 +17,9 @@ def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):
 
         inputs, labels = batch
         inputs, labels = inputs.to(device), labels.to(device)
-
         optimizer.zero_grad()
-        output = model(inputs)
-
-        loss = loss_fn(output, labels)
+        outputs = model(inputs.float())
+        loss = loss_fn(outputs, labels)
         loss.backward()
 
         optimizer.step()
