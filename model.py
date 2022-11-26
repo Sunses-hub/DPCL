@@ -82,12 +82,15 @@ class DAE(nn.Module):
         super(DAE, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Flatten(start_dim=2, end_dim=3),
+            nn.Flatten(start_dim=1, end_dim=2),
             nn.Linear(in_features=num_features, out_features=1024),
+            nn.BatchNorm1d(num_features=1024),
             nn.ReLU(inplace=True),
             nn.Linear(in_features=1024, out_features=512),
+            nn.BatchNorm1d(num_features=512),
             nn.ReLU(inplace=True),
             nn.Linear(in_features=512, out_features=256),
+            nn.BatchNorm1d(num_features=256),
             nn.ReLU(inplace=True)
         )
 
@@ -115,6 +118,6 @@ if __name__ == "__main__":
 
     print("DAE Test")
     denoiser_model = DAE(256*256)
-    random_data = torch.rand(16, 1, 256, 256)
+    random_data = torch.rand(16, 256, 256)
     print("Input size:", random_data.shape)
     print("Output size:", denoiser_model(random_data).shape)

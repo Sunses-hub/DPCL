@@ -27,7 +27,7 @@ class SCD(Dataset):
                         self.label_dirs.append(os.path.join(dir_name, file))
 
         if noisy:
-            self.noise = np.random.normal(loc=0, scale=1,size=(len(self.img_dirs), 1, 256, 256))
+            self.noise = np.random.normal(loc=0, scale=1,size=(len(self.img_dirs), 256, 256))
 
     def __len__(self):
         return len(self.img_dirs)
@@ -39,13 +39,13 @@ class SCD(Dataset):
 
 
         mask = io.imread(os.path.join(self.root_dir, 'Labels', self.label_dirs[index]), as_gray=True).astype('float32')
-        mask = np.expand_dims(mask, axis=0)
 
         if self.noisy:
             image = mask + self.noise[index]
         else:
             image = io.imread(os.path.join(self.root_dir, 'Images', self.img_dirs[index])).astype('float32')
             image = np.transpose(image, axes=(2, 0, 1))
+            mask = np.expand_dims(mask, axis=0)
 
             if self.transform:
                 image = self.transform(image)
