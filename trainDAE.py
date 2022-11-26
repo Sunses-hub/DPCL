@@ -33,7 +33,7 @@ if __name__ == "__main__":
     val_loss = []
 
     for epoch in range(NUM_EPOCHS):
-        print(f"EPOCHS : {epoch}")
+        print(f"EPOCHS : {epoch+1}")
 
         model.train(True)
         loss = train_one_epoch(train_dataloader, DEVICE, model, optimizer, loss_fn, verbose=5)

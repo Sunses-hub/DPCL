@@ -82,20 +82,20 @@ class DAE(nn.Module):
         super(DAE, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Linear(in_features=num_features, out_features=512),
+            nn.Linear(in_features=num_features, out_features=1024),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=512, out_features=128),
+            nn.Linear(in_features=1024, out_features=256),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=128, out_features=32),
+            nn.Linear(in_features=256, out_features=64),
             nn.ReLU(inplace=True)
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(in_features=32, out_features=128),
+            nn.Linear(in_features=64, out_features=256),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=128, out_features=512),
+            nn.Linear(in_features=256, out_features=1024),
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=512, out_features=num_features),
+            nn.Linear(in_features=1024, out_features=num_features),
             nn.ReLU(inplace=True)
         )
 
