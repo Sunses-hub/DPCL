@@ -10,10 +10,8 @@ class ACDCseg(Dataset):
 
     def __init__(self, keys, img_dir='seg_masks', label_dir='ground_truths', transform=None):
 
-        img_file_list = [file for file in sorted(os.listdir(img_dir)) if ".npy" in file]
-        mask_file_list = [file for file in sorted(os.listdir(label_dir)) if ".npy" in file]
-        self.img_files = [img_file_list[file_idx] for file_idx in keys]
-        self.mask_files = [mask_file_list[file_idx] for file_idx in keys]
+        self.img_files = [os.path.join(img_dir, str(file_name) + '.npy') for file_name in keys]
+        self.mask_files = [os.path.join(label_dir, str(file_name) + '.npy') for file_name in keys]
         self.transform = transform
 
     def __len__(self):
