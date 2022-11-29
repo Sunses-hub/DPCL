@@ -8,10 +8,12 @@ import matplotlib.pyplot as plt
 
 class ACDCseg(Dataset):
 
-    def __init__(self, train=True, img_dir='seg_masks', label_dir='ground_truths', transform=None):
+    def __init__(self, keys, img_dir='seg_masks', label_dir='ground_truths', transform=None):
 
-        self.img_files = [file for file in sorted(img_dir) if ".npy" in file]
-        self.mask_files = [file for file in sorted(label_dir) if ".npy" in file]
+        img_file_list = [file for file in sorted(os.listdir(img_dir)) if ".npy" in file]
+        mask_file_list = [file for file in sorted(os.listdir(label_dir)) if ".npy" in file]
+        self.img_files = [img_file_list[file_idx] for file_idx in keys]
+        self.mask_files = [mask_file_list[file_idx] for file_idx in keys]
         self.transform = transform
 
     def __len__(self):
