@@ -11,7 +11,6 @@ from dataset import SCD
 
 def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):
     running_loss = 0
-    loss_hist = []
     epoch_size = len(data_loader)
 
     for i, batch in enumerate(data_loader):
@@ -30,14 +29,11 @@ def train_one_epoch(data_loader, device, model, optimizer, loss_fn, verbose=10):
             # Display loss
             mean_loss = running_loss / verbose
             print(f"batch: {i+1}/{epoch_size} loss: {mean_loss}")
-            loss_hist.append(running_loss)
-            running_loss = 0
         elif (i+1) == epoch_size:
             mean_loss = running_loss / (epoch_size % verbose)
             print(f"batch {epoch_size}/{epoch_size} loss: {mean_loss}")
-            loss_hist.append(running_loss)
 
-    return np.array(loss_hist)
+    return running_loss
 
 if __name__ == "__main__":
 

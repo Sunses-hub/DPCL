@@ -2,9 +2,28 @@
 import numpy as np
 import os
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from skimage import io
 import matplotlib.pyplot as plt
+
+class ACDCseg(Dataset):
+
+    def __init__(self, train=True, img_dir='seg_masks', label_dir='ground_truths', transform=None):
+
+        self.img_files = [file for file in sorted(img_dir) if ".npy" in file]
+        self.mask_files = [file for file in sorted(label_dir) if ".npy" in file]
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.img_files)
+
+    def __getitem__(self, index):
+        img, mask = np.load(self.img_files[index]), np.load(self.mask_files[index])
+        if self.transform:
+            transformed = self.transform(image=img, mask=mask)
+            img, mask = transformed['image'], transformed['mask']
+        return img, mask
+
 
 class SCD(Dataset):
     """Sunny Brook Cardiac Imaging Dataset"""
