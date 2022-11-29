@@ -18,11 +18,27 @@ class ACDCseg(Dataset):
         return len(self.img_files)
 
     def __getitem__(self, index):
+        """
+        I will leave the class indices for mask because of the CrossEntropy loss function
+        but doing that may be wrong, so check that later.
+        """
         img, mask = np.load(self.img_files[index]), np.load(self.mask_files[index])
+        img = ACDCseg.img_processor(img)
         if self.transform:
             transformed = self.transform(image=img, mask=mask)
             img, mask = transformed['image'], transformed['mask']
         return img, mask
+
+    @staticmethod
+    def img_processor(img):
+        num_classes = len(np.unique(img))
+        new_img = np.zeros((num_classes, img.shape[0], img.shape[1]))
+        for row_idx in range(img.shape[0]):
+            for col_idx in range(img.shape[1]):
+                channel_num = img[row_idx, col_idx]
+                new_img[channel_num-1, row_idx, col_idx] = 255
+        return new_img
+
 
 
 class SCD(Dataset):
@@ -70,6 +86,7 @@ class SCD(Dataset):
                 image = self.transform(image)
 
         return image, mask
+
 
 # test
 if __name__ == "__main__":

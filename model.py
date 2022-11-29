@@ -26,7 +26,7 @@ class DoubleConv(nn.Module):
 
 class UNET2D(nn.Module):
 
-    def __init__(self, in_channels=3, out_channels=1):
+    def __init__(self, in_channels=4, out_channels=4):
         super(UNET2D, self).__init__()
 
         self.channels = [64, 128, 256, 512]
