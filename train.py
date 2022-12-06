@@ -23,7 +23,7 @@ if __name__ == "__main__":
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     BATCH_SIZE = config.batch_size
     NUM_WORKERS = config.num_workers
-    num_file = (os.listdir(config.img_dir))
+    num_file = len(os.listdir(config.img_dir))
     DATA_SIZE = num_file / 2 if os.path.join(config.img_dir, "0.png") in os.listdir(config.img_dir) else num_file
 
     model = UNET2D(in_channels=config.class_num, out_channels=config.class_num)
@@ -54,8 +54,8 @@ if __name__ == "__main__":
     train_data = ACDCseg(keys=train_keys, img_dir=config.img_dir, label_dir=config.label_dir, transform=transform)
     test_data = ACDCseg(keys=test_keys, img_dir=config.img_dir, label_dir=config.label_dir, transform=transform)
 
-    train_loader = DataLoader(train_data, batch_size=config.patch_size, num_workers=config.num_workers)
-    test_loader = DataLoader(test_data, batch_size=config.patch_size, num_workers=config.num_workers)
+    train_loader = DataLoader(train_data, batch_size=config.batch_size, num_workers=config.num_workers)
+    test_loader = DataLoader(test_data, batch_size=config.batch_size, num_workers=config.num_workers)
     train_loss = []
     val_loss = []
 

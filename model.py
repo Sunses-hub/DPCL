@@ -24,6 +24,96 @@ class DoubleConv(nn.Module):
         return self.encode(x)
 
 
+class DownConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(DownConv, self).__init__()
+
+        self.encode = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=2),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.encode(x)
+
+class UpConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(UpConv, self).__init__()
+
+        self.decode = nn.Sequential(
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=3, stride=2),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1,),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.decode(x)
+
+class PostDAE(nn.Module):
+    def __init__(self, in_channels=4, out_channels=4):
+        super(PostDAE, self).__init__()
+        # Encoder
+        self.L1 = DownConv(in_channels, 16)
+        self.L2 = DownConv(16, 32)
+        self.L3 = DownConv(32, 32)
+        self.L4 = DownConv(32, 32)
+        self.L5 = nn.Sequential(nn.Conv2d(32, 32, kernel_size=3, stride=2),
+                                nn.BatchNorm2d(32),
+                                nn.ReLU(inplace=True))
+        # FC
+        self.L6 = nn.Sequential(nn.Linear(2048, 4096),
+                                nn.BatchNorm1d(4096),
+                                nn.ReLU(inplace=True))
+        # Decoder
+        self.L8 = nn.Sequential(
+            nn.ConvTranspose2d(16, 16, kernel_size=3, stride=3),
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(16, 16, kernel_size=4, stride=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+        )#UpConv(16, 16)
+
+        self.L9 = UpConv(16, 16)
+        self.L10 = UpConv(16, 16)
+        self.L11 = UpConv(16, 16)
+        self.L12 = nn.Sequential(nn.ConvTranspose2d(16, 16, kernel_size=3, stride=1),
+                                 nn.BatchNorm2d(16),
+                                 nn.ReLU(inplace=True),
+                                 nn.Conv2d(16, out_channels, kernel_size=4, stride=1)
+        )
+
+        self.network = nn.ModuleList([self.L1, self.L2, self.L3, self.L4, self.L5,
+                                      self.L6,
+                                      self.L8, self.L9, self.L10, self.L11, self.L12])
+
+    def forward(self, x):
+        # Encoder
+        h = x
+        for i in range(5):
+            layer = self.network[i]
+            h = layer(h)
+        # Fully connected layer
+        h = h.view(h.size(0), -1)
+        h = self.L6(h)
+        tmp = h.size(1)
+        height = int(tmp / 16)
+        h = h.view(h.size(0), 16, int(height ** 0.5), int(height ** 0.5))
+        # Decoder
+        for i in range(5):
+            layer = self.network[6+i]
+            h = layer(h)
+
+        return h
+
+
 class UNET2D(nn.Module):
 
     def __init__(self, in_channels=4, out_channels=4):
@@ -72,7 +162,6 @@ class UNET2D(nn.Module):
             if idx % 2 == 0:
                 connection = F.resize(layer_outputs[-(1 + idx // 2)], out.shape[2:])
                 out = torch.cat((connection, out), dim=1)
-
         out = self.head(out)
         return out
 
@@ -109,6 +198,7 @@ class DAE(nn.Module):
 
 # test
 if __name__ == "__main__":
+    '''
     print("UNET2D Test")
     tmp = torch.rand(8,3,256,256)
     model = UNET2D(in_channels=3, out_channels=1)
@@ -121,3 +211,13 @@ if __name__ == "__main__":
     random_data = torch.rand(16, 256, 256)
     print("Input size:", random_data.shape)
     print("Output size:", denoiser_model(random_data).shape)
+    
+    '''
+
+    print("POST-DAE TEST")
+    tmp = torch.rand(8,4,352,352)
+    model = PostDAE(in_channels=4, out_channels=4)
+    output = model.forward(tmp)
+    print(f"Input shape: {tmp.shape}")
+    print(f"Output shape: {output.shape}")
+
